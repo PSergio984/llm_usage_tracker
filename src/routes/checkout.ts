@@ -1,8 +1,8 @@
 import type { Request, Response, NextFunction } from 'express';
 import { z } from 'zod';
-import Stripe from 'stripe';
 import { env } from '../config/env.js';
 import { AppError } from '../utils/errors.js';
+import { getStripe } from '../utils/stripe.js';
 
 const CheckoutSchema = z.object({
   tenantId: z.string().uuid(),
@@ -11,10 +11,7 @@ const CheckoutSchema = z.object({
   cancelUrl: z.string().url().optional(),
 });
 
-function getStripe(): Stripe {
-  if (!env.STRIPE_SECRET_KEY) throw new AppError(500, 'Stripe not configured');
-  return new Stripe(env.STRIPE_SECRET_KEY, { apiVersion: '2025-02-24.acacia' as any });
-}
+
 
 export async function checkoutHandler(req: Request, res: Response, next: NextFunction) {
   try {

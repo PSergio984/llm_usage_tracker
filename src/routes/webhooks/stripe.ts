@@ -1,13 +1,8 @@
 import type { Request, Response } from 'express';
-import Stripe from 'stripe';
 import { env } from '../../config/env.js';
 import { webhookEventRepo } from '../../repos/webhookEventRepo.js';
 import { StripeService } from '../../services/StripeService.js';
-
-function getStripe(): Stripe {
-  if (!env.STRIPE_SECRET_KEY) throw new Error('STRIPE_SECRET_KEY not configured');
-  return new Stripe(env.STRIPE_SECRET_KEY, { apiVersion: '2025-02-24.acacia' as any });
-}
+import { getStripe } from '../../utils/stripe.js';
 
 export async function stripeWebhookHandler(req: Request, res: Response) {
   const sig = req.headers['stripe-signature'] as string | undefined;
@@ -18,7 +13,7 @@ export async function stripeWebhookHandler(req: Request, res: Response) {
   }
   if (!sig) return res.status(400).json({ error: 'missing_signature' });
 
-  let event: Stripe.Event;
+  let event: import('stripe').Stripe.Event;
   try {
     const stripe = getStripe();
     // req.body is Buffer when using express.raw

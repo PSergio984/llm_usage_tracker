@@ -1,11 +1,5 @@
 import { pool } from '../db/pool.js';
-import Stripe from 'stripe';
-import { env } from '../config/env.js';
-
-function getStripe(): Stripe {
-  if (!env.STRIPE_SECRET_KEY) throw new Error('STRIPE_SECRET_KEY missing');
-  return new Stripe(env.STRIPE_SECRET_KEY, { apiVersion: '2025-02-24.acacia' as any });
-}
+import { getStripe } from '../utils/stripe.js';
 
 /**
  * Nightly reconciliation (2am UTC) per ADR 0008.
