@@ -1,0 +1,29 @@
+﻿# env
+.env
+.env.local
+
+# deps
+node_modules/
+dist/
+build/
+.next/
+
+# stripe
+.stripe/
+
+# logs
+*.log
+npm-debug.log*
+
+# ide
+.vscode/
+.idea/
+
+# tmp provisioning artifacts (keep out of repo)
+ticket-*.md
+map-body*.md
+resolution-*.md
+tickets-*.json
+stripe-ids.txt
+graphify-out/
+.sonar/
