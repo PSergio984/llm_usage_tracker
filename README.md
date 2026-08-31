@@ -90,7 +90,7 @@ Documented per brief §4: Free `1,000 API / 100k tokens`, Pro `10,000 API / 1M t
 
 - Sandbox: `stripe sandbox create --from-git` → `rkcs_test_...` + `pk_test_...` (7-day, `claim_url` in `docs/STRIPE.md`).
 - Products: `prod_VAkAqI3t32RJDU` Free ($0), `prod_VAkA7Rmo6a7YXR` Pro ($15) and prices `price_1UAOfl…`/`price_1UAOfn…` already in `STRIPE.md`.
-- CLI forward: `stripe listen --print-secret` → `whsec_...redacted... into `.env`. Never commit `.env` (`.gitignore:2:.env` verified via `git check-ignore -v .env`), use `.env.example` placeholders.
+- CLI forward: `stripe listen --print-secret` → `whsec_...` (ephemeral per `stripe listen` session) into `.env`. Never commit `.env` (`.gitignore:2:.env` verified via `git check-ignore -v .env`), use `.env.example` placeholders.
 
 ## Test
 

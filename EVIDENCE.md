@@ -162,7 +162,7 @@ Float trap avoided: `0.1+0.2=0.30000000000000004` vs `10+20=30` integer cents.
 # Before webhook: GET /usage → {"plan":"free","usage":{"apiCalls":{"limit":1000}}}
 stripe trigger checkout.session.completed  # CLI creates fixture + signed event, but test uses generateTestHeaderString hermetic
 
-# In test: signed POST /webhooks/stripe with checkout.session.completed {client_reference_id: tenant.id, subscription: sub_flip, customer: cus_...} + Stripe-Signature from stripe.webhooks.generateTestHeaderString({payload, secret: whsec_...redacted...
+# In test: signed POST /webhooks/stripe with checkout.session.completed {client_reference_id: tenant.id, subscription: sub_flip, customer: cus_...} + Stripe-Signature from stripe.webhooks.generateTestHeaderString({payload, secret: whsec_...})
 curl -H "Stripe-Signature: t=...,v1=..." -H "Content-Type: application/json" --data @payload.json http://localhost:3000/webhooks/stripe
 # → 200, then:
 psql -c "SELECT stripe_customer_id FROM tenants WHERE id='...'" → cus_...
@@ -201,7 +201,7 @@ curl -H "Stripe-Signature: $(stripe.webhooks.generateTestHeaderString({payload, 
 # (payload with status past_due/canceled + signed header → 200, then SELECT status)
 ```
 
-**Handler:** `src/routes/webhooks/stripe.ts` uses `express.raw({type:'application/json'})` isolated before `express.json()`, `stripe.webhooks.constructEvent(Buffer, sig, whsec_...redacted... → `400` on bad, `webhookEventRepo.tryInsert(event.id)` `ON CONFLICT DO NOTHING` → replay ignored, then `StripeService.handleCheckoutCompleted/Updated/Deleted` mirrors `plan_code`/`status` + `current_period_start/end`.
+**Handler:** `src/routes/webhooks/stripe.ts` uses `express.raw({type:'application/json'})` isolated before `express.json()`, `stripe.webhooks.constructEvent(Buffer, sig, whsec_...)` → `400` on bad, `webhookEventRepo.tryInsert(event.id)` `ON CONFLICT DO NOTHING` → replay ignored, then `StripeService.handleCheckoutCompleted/Updated/Deleted` mirrors `plan_code`/`status` + `current_period_start/end`.
 
 ---
 

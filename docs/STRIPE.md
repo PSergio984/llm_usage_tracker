@@ -46,10 +46,10 @@ These IDs are copied into `.env` (`STRIPE_PRODUCT_FREE`, `STRIPE_PRICE_FREE`, `S
 
   # Print only secret and exit (used for provisioning):
   stripe listen --print-secret
-  #   → whsec_...redacted... (session ephemeral, changes per listen)
+  #   → whsec_...replace_with_stripe_listen_output... (session ephemeral, changes per listen — never commit real whsec)
   ```
 
-- **Ephemeral whsec:** The `whsec_` from `stripe listen` is per CLI session, separate from Dashboard endpoint `whsec_`. For local dev, use the CLI one; for deployed, register endpoint in Dashboard Workbench and use that secret. Local `.env` currently holds the latest `whsec_...redacted... re-run `stripe listen --print-secret` after sandbox expiry or new session.
+- **Ephemeral whsec:** The `whsec_` from `stripe listen` is per CLI session, separate from Dashboard endpoint `whsec_`. For local dev, use the CLI one; for deployed, register endpoint in Dashboard Workbench and use that secret. Local `.env` holds the real `whsec_...` (git-ignored); re-run `stripe listen --print-secret` after sandbox expiry or new session.
 - **Replay / trigger (no browser):**
   ```bash
   stripe trigger checkout.session.completed

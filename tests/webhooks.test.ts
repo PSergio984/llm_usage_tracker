@@ -7,8 +7,8 @@ import { cleanDb, createTenant } from './helpers.js';
 import { env } from '../src/config/env.js';
 
 const app = createApp();
-const webhookSecret = env.STRIPE_WEBHOOK_SECRET ?? 'whsec_...redacted...';
-const stripe = new Stripe(env.STRIPE_SECRET_KEY ?? 'rkcs_test_fake', { apiVersion: '2024-06-20' });
+const webhookSecret = env.STRIPE_WEBHOOK_SECRET ?? 'whsec_test_placeholder_for_ci';
+const stripe = new Stripe(env.STRIPE_SECRET_KEY ?? 'rkcs_test_fake', { apiVersion: '2025-02-24.acacia' as any });
 
 function signedHeaders(payload: string, secret = webhookSecret) {
   const header = (stripe as any).webhooks.generateTestHeaderString({ payload, secret });
