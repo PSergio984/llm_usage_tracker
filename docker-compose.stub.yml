@@ -1,0 +1,19 @@
+# Stub — docker-compose for local Postgres (copy to docker-compose.yml when graduating)
+# Usage: docker compose up -d && npm run migrate && npm run seed
+# Keep $0 stack per brief §10 — no credit card
+
+# services:
+#   db:
+#     image: postgres:16-alpine
+#     environment:
+#       POSTGRES_USER: postgres
+#       POSTGRES_PASSWORD: postgres
+#       POSTGRES_DB: llm_usage_tracker
+#     ports:
+#       - "5432:5432"
+#     volumes:
+#       - pgdata:/var/lib/postgresql/data
+# volumes:
+#   pgdata:
+
+stub: see commented YAML above — section is outline only, file not yet wired.

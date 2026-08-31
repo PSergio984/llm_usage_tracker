@@ -1,0 +1,12 @@
+# Stub — capstone.yaml manifest the evaluator reads per brief §10
+# Copy to capstone.yaml at root when real src exists, fill in run/seed/test/base_url
+
+# run: "docker compose up -d && npm run migrate && npm run seed && npm run dev"  # one command that boots the system
+# seed: "npm run seed"                           # demo data (tenants Free/Pro, plans)
+# test: "npm test"                               # optional deterministic suite (stretch)
+# base_url: "http://localhost:3000"             # endpoints to probe
+# endpoints:
+#   generate: "POST /generate"                  # billable, Idempotency-Key header
+#   usage: "GET /usage?tenantId=:id"
+#   checkout: "POST /checkout"
+#   webhook: "POST /webhooks/stripe"            # raw-body, signature verify, dedup
