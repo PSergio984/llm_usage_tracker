@@ -2,16 +2,16 @@ import { pool } from './pool.js';
 
 async function seed() {
   console.log('[seed] ensuring demo tenants ...');
-  // Two demo tenants: one Free, one Pro (via subscription). Tenant isolation proof creates both.
+  // Two demo tenants: deterministic fixed UUIDs so evaluator can probe without extra API (also POST /tenants available)
   const tenants = [
-    { name: 'Acme — Free tenant', plan: 'free' as const },
-    { name: 'Globex — Pro tenant', plan: 'pro' as const },
+    { id: '00000000-0000-4000-a000-000000000001', name: 'Acme — Free tenant', plan: 'free' as const },
+    { id: '00000000-0000-4000-a000-000000000002', name: 'Globex — Pro tenant', plan: 'pro' as const },
   ];
 
   for (const t of tenants) {
     const { rows } = await pool.query(
-      `INSERT INTO tenants (name) VALUES ($1) RETURNING id, name`,
-      [t.name]
+      `INSERT INTO tenants (id, name) VALUES ($1, $2) ON CONFLICT (id) DO UPDATE SET name=EXCLUDED.name RETURNING id, name`,
+      [t.id, t.name]
     );
     const tenant = rows[0];
     console.log(`[seed] tenant ${tenant.name} → ${tenant.id}`);

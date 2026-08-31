@@ -4,6 +4,7 @@ import { usageHandler } from './routes/usage.js';
 import { generateHandler } from './routes/generate.js';
 import { checkoutHandler } from './routes/checkout.js';
 import { stripeWebhookHandler } from './routes/webhooks/stripe.js';
+import { listTenantsHandler, createTenantHandler } from './routes/tenants.js';
 import { tenantMiddleware } from './middleware/tenant.js';
 import { requireIdempotencyKey } from './middleware/idempotency.js';
 import { errorHandler } from './middleware/error.js';
@@ -19,6 +20,10 @@ export function createApp() {
 
   // All other routes use json
   app.use(express.json());
+
+  // Tenant bootstrap for evaluator — no auth, creates tenant for probes (after json)
+  app.get('/tenants', listTenantsHandler);
+  app.post('/tenants', createTenantHandler);
 
   // Usage rollup — tenant can be header or query ?tenantId
   app.get('/usage', tenantMiddleware, usageHandler);

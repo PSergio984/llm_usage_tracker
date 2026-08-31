@@ -61,7 +61,7 @@ cp .env.example .env
 docker compose up -d          # Postgres 16 on 5433 (host 5432 conflicts with host postgres-x64-18)
 npm install
 npm run migrate                # applies migrations/001_init.sql (5 tables + 15 indexes)
-npm run seed                   # seeds 2 tenants (Acme free, Globex pro active) — counts tenants 2 / plans 2 / subscriptions 1
+npm run seed                   # seeds 2 deterministic tenants: Acme free 00000000-0000-4000-a000-000000000001, Globex pro 00000000-0000-4000-a000-000000000002
 npm run dev                    # http://localhost:3000
 
 # in another terminal, forward signed webhooks to localhost:
@@ -70,15 +70,17 @@ stripe listen --events checkout.session.completed,customer.subscription.updated,
 
 # smoke test without browser:
 stripe trigger checkout.session.completed
-curl -H "X-Tenant-Id: <uuid>" -H "Idempotency-Key: k1" -H "Content-Type: application/json" -d '{"type":"api_call","quantity":1}' http://localhost:3000/generate
-curl -H "X-Tenant-Id: <uuid>" http://localhost:3000/usage
+curl http://localhost:3000/tenants  # lists deterministic tenants above
+curl -H "X-Tenant-Id: 00000000-0000-4000-a000-000000000001" -H "Idempotency-Key: k1" -H "Content-Type: application/json" -d '{"type":"api_call","quantity":1}' http://localhost:3000/generate
+curl -H "X-Tenant-Id: 00000000-0000-4000-a000-000000000001" http://localhost:3000/usage
 curl http://localhost:3000/health
+curl -H "Content-Type: application/json" -d '{"name":"My Tenant"}' http://localhost:3000/tenants  # create tenant for probe
 
 # one-command per capstone.yaml run:
 docker compose up -d && npm install && npm run migrate && npm run seed && npm run dev
 ```
 
-Seed step creates demo tenants; grab their UUIDs via `psql` or `GET /usage?tenantId=<id>` after seed, or create your own via `INSERT INTO tenants (name) VALUES ('My Tenant') RETURNING id`.
+Seed creates deterministic tenants (`00000000-0000-4000-a000-000000000001` Free, `...0002` Pro) on `ON CONFLICT DO UPDATE`; evaluator can also `POST /tenants {"name":"My Tenant"}` or `GET /tenants` to discover IDs (no auth).
 
 ## Plans & quotas
 
@@ -101,8 +103,7 @@ npx tsc --noEmit          # typecheck
 
 - `POST /generate` is a dummy billable endpoint; no real AI model call — token counts are simulated numbers you pass.
 - `POST /checkout` creates Checkout Session but does not render frontend; you redirect to `session.url` yourself.
-- Overage billing, invoices, alerts, proration, reconciliation, and full deterministic suite beyond the 19-test core are **spec'd as ADRs 0004–0009** and stubbed in `src/jobs/` (node-cron) but not fully wired as shipped endpoints — they are stretches gated on core correctness per wayfinder. The 19-test suite covers Probes 1–5, tenant isolation, and the scary cases; a production deploy would need to copy `*.stub.ts` prototypes to real `src/` and wire `usage_alerts`/`invoices`/`reconciliation_reports` tables.
-- Background jobs are `node-cron` stubs with `pg_try_advisory_xact_lock` and `job_runs` table, not yet scheduled in `src/index.ts` (add `import './jobs/alerts.js'` + cron in production).
+- Overage billing, invoices, alerts, proration, reconciliation, and full deterministic suite beyond the 19-test core are **spec'd as ADRs 0004–0009** and `src/jobs/` (node-cron `5m` alerts + `2am` reconciliation with `pg_try_advisory_xact_lock` now wired in `src/index.ts:1` per code-review fix). The 19-test suite covers Probes 1–5, tenant isolation, and the scary cases; stretches are gated on core.
 - Host port `5433` is used because `postgresql-x64-18` already listens on `5432`; change back to `5432:5432` in `docker-compose.yml` if host postgres is stopped.
 
 ## Required files per Section 10
